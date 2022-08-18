@@ -12,6 +12,10 @@ type Response struct {
 	Content string
 }
 
+func NewResponse(content string, error bool) *Response {
+	return &Response{Content: content, Err: error}
+}
+
 func (r Response) Bytes() []byte {
 	buf := bytes.Buffer{}
 	enc := gob.NewEncoder(&buf)
