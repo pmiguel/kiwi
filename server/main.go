@@ -1,7 +1,7 @@
 package main
 
 import (
-	server "github.com/pmiguel/kiwi/server/network"
+	kiwi "github.com/pmiguel/kiwi/server/network"
 )
 
 const (
@@ -10,6 +10,6 @@ const (
 )
 
 func main() {
-	server := server.New(HOST, PORT)
+	server := kiwi.New(HOST, PORT)
 	server.Start()
 }
