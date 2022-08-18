@@ -3,6 +3,7 @@ package protocol
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"log"
 )
 
@@ -21,4 +22,16 @@ func (r Response) Bytes() []byte {
 		log.Fatal(err)
 	}
 	return buf.Bytes()
+}
+
+func (r *Response) UnmarshalBinary(data []byte) error {
+	b := bytes.NewBuffer(data)
+	_, err := fmt.Fscanf(b, "%t %s\n", &r.Err, &r.Content)
+	return err
+}
+
+func (r *Response) MarshalBinary() (data []byte, err error) {
+	var b bytes.Buffer
+	_, err = fmt.Fprintf(&b, "%t %s\n", r.Err, r.Content)
+	return b.Bytes(), err
 }

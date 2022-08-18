@@ -49,39 +49,53 @@ func (s *Server) Start() {
 func handleIncomingRequest(conn net.Conn) {
 	sender := conn.RemoteAddr().String()
 	fmt.Println("<= " + sender)
-	counter := 0
 	for {
-		packet := make([]byte, inboundBufferSize)
-		length, err := conn.Read(packet)
+		inboundBuffer := make([]byte, inboundBufferSize)
+		length, err := conn.Read(inboundBuffer)
 
 		if err != nil {
 			break
 		}
 
-		request, decodeError := decodeRequest(&packet)
+		request, decodeError := decodeRequest(inboundBuffer)
 
 		if decodeError == nil {
-			fmt.Printf("<< 0x%x (%d bytes) n:%d {%s}\n", packet, length, counter, sender)
+			fmt.Printf("<< 0x%x (%d bytes) {%s}\n", inboundBuffer, length, sender)
 			fmt.Printf("\t<< %s", request.String())
 		} else {
 			fmt.Printf("<< %s", err)
 		}
 
-		counter++
-		res := protocol.Response{Content: "PONG"}
+		response := executeCommand(&request)
+		responseBytes, err := encodeResponse(&response)
 
-		conn.Write(res.Bytes())
+		conn.Write(responseBytes)
 	}
 	fmt.Println("=> " + sender)
 	conn.Close()
 }
 
-func decodeRequest(packet *[]byte) (protocol.Request, error) {
-	buffer := bytes.NewBuffer(*packet)
+func decodeRequest(packet []byte) (protocol.Request, error) {
+	buffer := bytes.NewBuffer(packet)
 	dec := gob.NewDecoder(buffer)
 
 	var req protocol.Request
 	err := dec.Decode(&req)
 
 	return req, err
+}
+
+func encodeResponse(response *protocol.Response) ([]byte, error) {
+	buffer := bytes.Buffer{}
+	dec := gob.NewEncoder(&buffer)
+
+	err := dec.Encode(response)
+	return buffer.Bytes(), err
+}
+
+func executeCommand(request *protocol.Request) protocol.Response {
+	if request.Command == "PING" {
+		return protocol.Response{Err: false, Content: "PONG"}
+	}
+	return protocol.Response{Err: true, Content: "KIWI_UNSUPPORTED_COMMAND"}
 }
