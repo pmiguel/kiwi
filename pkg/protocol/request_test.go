@@ -1,6 +1,9 @@
 package protocol
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func TestNewRequest(t *testing.T) {
 	expectedCommand := "command"
@@ -9,17 +12,9 @@ func TestNewRequest(t *testing.T) {
 
 	request := NewRequest(expectedCommand, expectedKey, expectedValue)
 
-	if request.Command != expectedCommand {
-		t.Errorf("request.Command = %s; want %s", request.Command, expectedCommand)
-	}
-
-	if request.Key != expectedKey {
-		t.Errorf("request.Key = %s; want %s", request.Key, expectedKey)
-	}
-
-	if request.Value != expectedValue {
-		t.Errorf("request.Value = %s; want %s", request.Value, expectedValue)
-	}
+	assert.Equal(t, expectedCommand, request.Command, "should be equal")
+	assert.Equal(t, expectedKey, request.Key, "should be equal")
+	assert.Equal(t, expectedValue, request.Value, "should be equal")
 }
 
 func TestRequest_MarshalBinary(t *testing.T) {
@@ -31,14 +26,10 @@ func TestRequest_MarshalBinary(t *testing.T) {
 
 	binaryData, err := request.MarshalBinary()
 
-	if err != nil {
-		t.Errorf("Error. %s", err)
-	}
-
-	if string(binaryData) != "command key value\n" {
-		t.Errorf("Failed serialization failed. Got %s", string(binaryData))
-	}
+	assert.Nil(t, err, "should be nil")
+	assert.Equal(t, "command key value\n", string(binaryData), "should be equal")
 }
+
 func TestRequest_UnmarshalBinary(t *testing.T) {
 	expectedCommand := "command"
 	expectedKey := "key"
@@ -50,19 +41,8 @@ func TestRequest_UnmarshalBinary(t *testing.T) {
 
 	err := request.UnmarshalBinary(input)
 
-	if err != nil {
-		t.Errorf("Error. %s", err)
-	}
-
-	if request.Command != expectedCommand {
-		t.Errorf("request.Command = %s; want %s", request.Command, expectedCommand)
-	}
-
-	if request.Key != expectedKey {
-		t.Errorf("request.Key = %s; want %s", request.Key, expectedKey)
-	}
-
-	if request.Value != expectedValue {
-		t.Errorf("request.Value = %s; want %s", request.Value, expectedValue)
-	}
+	assert.Nil(t, err, "should be nil")
+	assert.Equal(t, expectedCommand, request.Command, "should be equal")
+	assert.Equal(t, expectedKey, request.Key, "should be equal")
+	assert.Equal(t, expectedValue, request.Value, "should be equal")
 }
