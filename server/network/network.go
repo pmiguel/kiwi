@@ -52,23 +52,17 @@ func handleIncomingRequest(conn net.Conn) {
 	counter := 0
 	for {
 		packet := make([]byte, inboundBufferSize)
-		_, err := conn.Read(packet)
+		length, err := conn.Read(packet)
 
 		if err != nil {
 			break
 		}
 
-		var buffer bytes.Buffer
-		buffer.Write(packet)
+		request, decodeError := decodeRequest(&packet)
 
-		dec := gob.NewDecoder(&buffer)
-
-		var req protocol.Request
-		err = dec.Decode(&req)
-
-		if err == nil {
-			fmt.Printf("<< 0x%x (%d bytes) n:%d {%s}\n", buffer, buffer.Len(), counter, sender)
-			fmt.Printf("\t<< %s", req.String())
+		if decodeError == nil {
+			fmt.Printf("<< 0x%x (%d bytes) n:%d {%s}\n", packet, length, counter, sender)
+			fmt.Printf("\t<< %s", request.String())
 		} else {
 			fmt.Printf("<< %s", err)
 		}
@@ -80,4 +74,14 @@ func handleIncomingRequest(conn net.Conn) {
 	}
 	fmt.Println("=> " + sender)
 	conn.Close()
+}
+
+func decodeRequest(packet *[]byte) (protocol.Request, error) {
+	buffer := bytes.NewBuffer(*packet)
+	dec := gob.NewDecoder(buffer)
+
+	var req protocol.Request
+	err := dec.Decode(&req)
+
+	return req, err
 }
