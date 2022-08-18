@@ -13,7 +13,7 @@ const (
 )
 
 func handleIncomingRequest(conn net.Conn) {
-	fmt.Println("-> Hello " + conn.RemoteAddr().String())
+	fmt.Println("<= " + conn.RemoteAddr().String())
 	counter := 0
 	for {
 		buffer := make([]byte, 1024)
@@ -23,11 +23,12 @@ func handleIncomingRequest(conn net.Conn) {
 			break
 		}
 
-		fmt.Printf("%d << %s [0x%x], len: %d \n", counter, string(buffer[:length]), buffer[:length], length)
+		content := string(buffer[:length])
+		fmt.Printf("<< %s (%d bytes) [0x%x], n:%d\n", content, length, content, counter)
 		counter++
 		conn.Write([]byte("PONG"))
 	}
-	fmt.Println("-X Bye " + conn.RemoteAddr().String())
+	fmt.Println("=> " + conn.RemoteAddr().String())
 	conn.Close()
 }
 
