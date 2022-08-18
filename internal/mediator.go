@@ -1,4 +1,4 @@
-package main
+package internal
 
 type CommandResult struct {
 	Err    *string

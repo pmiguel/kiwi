@@ -1,10 +1,10 @@
-package main
+package internal
 
 import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"github.com/pmiguel/kiwi/common/protocol"
+	"github.com/pmiguel/kiwi/pkg/protocol"
 	"log"
 	"net"
 )

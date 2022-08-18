@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/pmiguel/kiwi/internal"
+)
 
 const (
 	HOST = "localhost"
@@ -10,9 +13,9 @@ const (
 func main() {
 	// server := NewServer(HOST, PORT)
 
-	mediator := NewMediator()
+	mediator := internal.NewMediator()
 
-	mediator.RegisterCommand("PING", PingCommand{})
+	mediator.RegisterCommand("PING", internal.PingCommand{})
 
 	res, err := mediator.Execute("PING")
 	_, err2 := mediator.Execute("UNAVAILABLE")
