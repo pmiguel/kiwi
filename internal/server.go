@@ -7,7 +7,6 @@ import (
 )
 
 const proto = "tcp"
-const inboundBufferSize = 64
 
 type Server struct {
 	host           string
@@ -21,7 +20,7 @@ func NewServer(host string, port string) *Server {
 		host:           host,
 		port:           port,
 		running:        false,
-		sessionManager: NewSessionManager(),
+		sessionManager: NewSessionManager(true),
 	}
 }
 
@@ -40,8 +39,7 @@ func (s *Server) Start() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		session := s.sessionManager.RegisterSession(conn)
-		go session.StartSessionListener()
+		s.sessionManager.RegisterSession(conn)
 	}
 	listener.Close()
 }

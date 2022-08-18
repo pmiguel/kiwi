@@ -14,9 +14,8 @@ type Mediator struct {
 }
 
 func NewMediator() *Mediator {
-	var m Mediator
-	m.commandMap = make(map[string]HandleCommand)
-	return &m
+	mediator := Mediator{commandMap: make(map[string]HandleCommand)}
+	return &mediator
 }
 
 func (m *Mediator) RegisterCommand(command string, handler HandleCommand) {

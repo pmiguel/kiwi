@@ -10,6 +10,12 @@ type Session struct {
 	conn net.Conn
 }
 
+const inboundBufferSize = 64
+
+func NewSession(conn net.Conn) *Session {
+	return &Session{conn: conn}
+}
+
 func (s *Session) StartSessionListener() {
 	conn := s.conn
 	sender := conn.RemoteAddr().String()
