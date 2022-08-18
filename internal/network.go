@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
 	"github.com/pmiguel/kiwi/pkg/protocol"
 	"log"
@@ -57,9 +55,9 @@ func handleIncomingRequest(conn net.Conn) {
 			break
 		}
 
-		request, decodeError := decodeRequest(inboundBuffer)
+		request, err := protocol.Decode[protocol.Request](inboundBuffer)
 
-		if decodeError == nil {
+		if err == nil {
 			fmt.Printf("<< 0x%x (%d bytes) {%s}\n", inboundBuffer, length, sender)
 			fmt.Printf("\t<< %s", request.String())
 		} else {
@@ -67,30 +65,12 @@ func handleIncomingRequest(conn net.Conn) {
 		}
 
 		response := executeCommand(&request)
-		responseBytes, err := encodeResponse(&response)
+		responseBytes, err := protocol.Encode[protocol.Response](&response)
 
 		conn.Write(responseBytes)
 	}
 	fmt.Println("=> " + sender)
 	conn.Close()
-}
-
-func decodeRequest(packet []byte) (protocol.Request, error) {
-	buffer := bytes.NewBuffer(packet)
-	dec := gob.NewDecoder(buffer)
-
-	var req protocol.Request
-	err := dec.Decode(&req)
-
-	return req, err
-}
-
-func encodeResponse(response *protocol.Response) ([]byte, error) {
-	buffer := bytes.Buffer{}
-	dec := gob.NewEncoder(&buffer)
-
-	err := dec.Encode(response)
-	return buffer.Bytes(), err
 }
 
 func executeCommand(request *protocol.Request) protocol.Response {
