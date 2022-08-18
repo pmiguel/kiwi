@@ -1,8 +1,10 @@
 package network
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
-	"github.com/pmiguel/kiwi/server/protocol"
+	"github.com/pmiguel/kiwi/common/protocol"
 	"log"
 	"net"
 )
@@ -16,7 +18,7 @@ type Server struct {
 	running bool
 }
 
-func New(host string, port string) *Server {
+func NewServer(host string, port string) *Server {
 	return &Server{
 		host:    host,
 		port:    port,
@@ -49,17 +51,26 @@ func handleIncomingRequest(conn net.Conn) {
 	fmt.Println("<= " + sender)
 	counter := 0
 	for {
-		buffer := make([]byte, inboundBufferSize)
-		length, err := conn.Read(buffer)
+		packet := make([]byte, inboundBufferSize)
+		length, err := conn.Read(packet)
 
 		if err != nil {
 			break
 		}
 
-		content := string(buffer[:length])
-		fmt.Printf("<< %s (%d bytes) [0x%x], n:%d {%s}\n", content, length, content, counter, sender)
-		counter++
+		dec := gob.NewDecoder(bytes.NewBuffer(packet))
 
+		var req protocol.Request
+		err = dec.Decode(&req)
+
+		if err == nil {
+			fmt.Printf("<< 0x%x (%d bytes) n:%d {%s}\n", string(packet), length, counter, sender)
+			fmt.Printf("\t<< %s", req.String())
+		} else {
+			fmt.Printf("<< %s", err)
+		}
+
+		counter++
 		res := protocol.Response{Content: "PONG"}
 
 		conn.Write(res.Bytes())

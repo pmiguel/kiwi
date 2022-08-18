@@ -10,6 +10,6 @@ const (
 )
 
 func main() {
-	server := kiwi.New(HOST, PORT)
+	server := kiwi.NewServer(HOST, PORT)
 	server.Start()
 }
