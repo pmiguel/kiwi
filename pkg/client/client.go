@@ -10,7 +10,6 @@ import (
 	"net"
 	"os"
 	"strings"
-	"time"
 )
 
 const (
@@ -18,6 +17,24 @@ const (
 	PORT = "7170"
 	TYPE = "tcp"
 )
+
+func decodeResponse(packet []byte) (protocol.Response, error) {
+	buffer := bytes.NewBuffer(packet)
+	dec := gob.NewDecoder(buffer)
+
+	var res protocol.Response
+	err := dec.Decode(&res)
+
+	return res, err
+}
+
+func encodeRequest(request *protocol.Request) ([]byte, error) {
+	buffer := bytes.Buffer{}
+	dec := gob.NewEncoder(&buffer)
+
+	err := dec.Encode(request)
+	return buffer.Bytes(), err
+}
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
@@ -29,22 +46,19 @@ func main() {
 	}
 
 	for {
-		var writeBuffer bytes.Buffer
-		enc := gob.NewEncoder(&writeBuffer)
+		var readBuffer = make([]byte, 1024)
 
-		fmt.Print(">> ")
+		fmt.Print(conn.RemoteAddr().String() + " >> ")
 		text, _ := reader.ReadString('\n')
 
 		target := strings.TrimSpace(text)
 
-		req := protocol.NewRequest(target, "key", "value")
-		enc.Encode(req)
-		conn.Write(writeBuffer.Bytes())
+		requestBytes, _ := encodeRequest(protocol.NewRequest(target, "key", "value"))
+		conn.Write(requestBytes)
+		conn.Read(readBuffer)
+		dec, _ := decodeResponse(readBuffer)
 
-		var buffer bytes.Buffer
-		conn.Read(buffer.Bytes())
-		fmt.Printf("<< %s \n", buffer.String())
-		time.Sleep(1 * time.Second)
+		fmt.Printf("%s (Err: %t)\n", dec.Content, dec.Err)
 	}
 	conn.Close()
 }
