@@ -10,7 +10,7 @@ import (
 )
 
 const proto = "tcp"
-const inboundBufferSize = 1024
+const inboundBufferSize = 64
 
 type Server struct {
 	host    string
@@ -52,19 +52,22 @@ func handleIncomingRequest(conn net.Conn) {
 	counter := 0
 	for {
 		packet := make([]byte, inboundBufferSize)
-		length, err := conn.Read(packet)
+		_, err := conn.Read(packet)
 
 		if err != nil {
 			break
 		}
 
-		dec := gob.NewDecoder(bytes.NewBuffer(packet))
+		var buffer bytes.Buffer
+		buffer.Write(packet)
+
+		dec := gob.NewDecoder(&buffer)
 
 		var req protocol.Request
 		err = dec.Decode(&req)
 
 		if err == nil {
-			fmt.Printf("<< 0x%x (%d bytes) n:%d {%s}\n", string(packet), length, counter, sender)
+			fmt.Printf("<< 0x%x (%d bytes) n:%d {%s}\n", buffer, buffer.Len(), counter, sender)
 			fmt.Printf("\t<< %s", req.String())
 		} else {
 			fmt.Printf("<< %s", err)

@@ -10,6 +10,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -27,20 +28,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var writeBuffer bytes.Buffer
-	enc := gob.NewEncoder(&writeBuffer)
-
 	for {
+		var writeBuffer bytes.Buffer
+		enc := gob.NewEncoder(&writeBuffer)
+
 		fmt.Print(">> ")
 		text, _ := reader.ReadString('\n')
 
-		req := protocol.NewRequest(strings.TrimSpace(text), "", "")
+		target := strings.TrimSpace(text)
+
+		req := protocol.NewRequest(target, "key", "value")
 		enc.Encode(req)
 		conn.Write(writeBuffer.Bytes())
 
-		buffer := make([]byte, 1024)
-		length, _ := conn.Read(buffer)
-		fmt.Printf("<< %s \n", string(buffer[:length]))
+		var buffer bytes.Buffer
+		conn.Read(buffer.Bytes())
+		fmt.Printf("<< %s \n", buffer.String())
+		time.Sleep(1 * time.Second)
 	}
 	conn.Close()
 }
