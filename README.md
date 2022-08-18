@@ -7,18 +7,22 @@ As added features, support for strong namespacing would be a nice to have additi
 
 ## Planned work for first demo:
 - Supported Commands:
-  - PING
-  - GET
-  - SET
-  - KEY
-- Namespacing
-- TTL
-  - Simple time based
-  - Counter based
-  - Duration based, with refresh on hit
-- Simple Auth
-- Defined communication protocol
-  - Raw TCP-based, not unlike Redis.
+  - [x] PING
+  - [ ] GET
+  - [ ] SET
+  - [ ] KEYS
+- [ ] Namespacing
+- [ ] TTL
+  - [ ] Simple time based
+  - [ ] Counter based
+  - [ ] Duration based, with refresh on hit
+- [ ] Simple Auth
+- Protocols:
+  - [ ] Connection Handshake and protocol negociation
+  - Kiwi Communication Protocol (KCP)
+    - [x] V0: string marshalling to bytes for testing purposes
+    - [ ] V1: Standard Kiwi Protocol V1
+  - [ ] Redis RESP-compatible protocol
 
 ## Name Origin
 
