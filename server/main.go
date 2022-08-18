@@ -1,8 +1,6 @@
 package main
 
-import (
-	kiwi "github.com/pmiguel/kiwi/server/network"
-)
+import "fmt"
 
 const (
 	HOST = "localhost"
@@ -10,6 +8,19 @@ const (
 )
 
 func main() {
-	server := kiwi.NewServer(HOST, PORT)
-	server.Start()
+	// server := NewServer(HOST, PORT)
+
+	mediator := NewMediator()
+
+	mediator.RegisterCommand("PING", PingCommand{})
+
+	res, err := mediator.Execute("PING")
+	_, err2 := mediator.Execute("UNAVAILABLE")
+
+	fmt.Println(res.Result)
+	fmt.Println(err)
+
+	fmt.Println(err2)
+
+	// server.Start()
 }
