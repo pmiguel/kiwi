@@ -10,14 +10,29 @@ import (
 const proto = "tcp"
 const inboundBufferSize = 1024
 
-func StartServer(host string, port string) {
-	listener, err := net.Listen(proto, host+":"+port)
+type Server struct {
+	host    string
+	port    string
+	running bool
+}
+
+func New(host string, port string) *Server {
+	return &Server{
+		host:    host,
+		port:    port,
+		running: false,
+	}
+}
+
+func (s *Server) Start() {
+	listener, err := net.Listen(proto, s.host+":"+s.port)
+	s.running = true
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Kiwi listening on port " + port)
+	fmt.Println("Kiwi listening on port " + s.port)
 
 	for {
 		conn, err := listener.Accept()

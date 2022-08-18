@@ -1,6 +1,8 @@
 package main
 
-import "github.com/pmiguel/kiwi/server/network"
+import (
+	server "github.com/pmiguel/kiwi/server/network"
+)
 
 const (
 	HOST = "localhost"
@@ -8,5 +10,6 @@ const (
 )
 
 func main() {
-	network.StartServer(HOST, PORT)
+	server := server.New(HOST, PORT)
+	server.Start()
 }
