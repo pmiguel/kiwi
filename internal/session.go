@@ -51,5 +51,10 @@ func (s *Session) executeCommand(request *protocol.Request) protocol.Response {
 	if request.Command == "PING" {
 		return protocol.Response{Err: false, Content: "PONG"}
 	}
+
+	if request.Command == "SET" {
+		fmt.Printf("\t%s %s %s\n", request.Command, request.Key, request.Value)
+	}
+
 	return protocol.Response{Err: true, Content: "KIWI_UNSUPPORTED_COMMAND"}
 }

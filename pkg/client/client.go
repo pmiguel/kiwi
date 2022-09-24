@@ -33,7 +33,9 @@ func main() {
 
 		target := strings.TrimSpace(text)
 
-		requestBytes, _ := protocol.Encode[protocol.Request](protocol.NewRequest(target, "key", "value"))
+		tokens := strings.Split(target, " ")
+
+		requestBytes, _ := protocol.Encode[protocol.Request](protocol.NewRequest(tokens[0], tokens[1], tokens[2]))
 		conn.Write(requestBytes)
 		conn.Read(readBuffer)
 		dec, _ := protocol.Decode[protocol.Response](readBuffer)
