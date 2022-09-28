@@ -8,10 +8,12 @@ As added features, support for strong namespacing would be a nice to have additi
 ## Planned work for first demo:
 - Supported Commands:
   - [x] PING
-  - [ ] GET
-  - [ ] SET
+  - [x] GET
+  - [x] SET
+  - [ ] DEL
   - [ ] KEYS
 - [ ] Namespacing
+- [ ] Distributed Locks
 - [ ] TTL
   - [ ] Simple time based
   - [ ] Counter based
@@ -20,8 +22,8 @@ As added features, support for strong namespacing would be a nice to have additi
 - Protocols:
   - [ ] Connection Handshake and protocol negociation
   - Kiwi Communication Protocol (KCP)
-    - [x] V0: string marshalling to bytes for testing purposes
-    - [ ] V1: Standard Kiwi Protocol V1
+    - [x] V0: durimentary string marshalling to bytes for testing purposes
+    - [ ] V1: Protobuf-based
   - [ ] Redis RESP-compatible protocol
 
 ## Name Origin
