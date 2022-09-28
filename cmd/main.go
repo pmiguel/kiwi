@@ -11,12 +11,9 @@ const (
 
 func main() {
 	server := internal.NewServer(HOST, PORT)
-	sessionManager := internal.NewSessionManager(server)
 	storageManager := internal.NewStorageManager(server)
-	dispatcher := internal.NewDispatcher(server, storageManager)
+	internal.NewSessionManager(server)
+	internal.NewDispatcher(server, storageManager)
 
-	server.StorageManager = storageManager
-	server.SessionManager = sessionManager
-	server.Dispatcher = dispatcher
 	server.Start()
 }

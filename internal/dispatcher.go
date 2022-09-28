@@ -28,6 +28,11 @@ func (d *Dispatcher) Dispatch(request protocol.Request) protocol.Response {
 
 	if request.Command == "GET" {
 		value := d.storageManager.Get(request.Key)
+
+		if value == "" {
+			return protocol.Response{Err: true, Content: "KIWI_KEY_NOT_FOUND"}
+		}
+
 		return protocol.Response{Err: false, Content: value}
 	}
 
