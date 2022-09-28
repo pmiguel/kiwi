@@ -35,7 +35,22 @@ func main() {
 
 		tokens := strings.Split(target, " ")
 
-		requestBytes, _ := protocol.Encode[protocol.Request](protocol.NewRequest(tokens[0], tokens[1], tokens[2]))
+		var request *protocol.Request
+
+		if len(tokens) == 1 {
+			request = protocol.NewRequest(tokens[0], "#", "#")
+		}
+
+		if len(tokens) == 2 {
+			request = protocol.NewRequest(tokens[0], tokens[1], "#")
+		}
+
+		if len(tokens) == 3 {
+			request = protocol.NewRequest(tokens[0], tokens[1], tokens[2])
+		}
+
+		requestBytes, _ := protocol.Encode[protocol.Request](request)
+
 		conn.Write(requestBytes)
 		conn.Read(readBuffer)
 		dec, _ := protocol.Decode[protocol.Response](readBuffer)

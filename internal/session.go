@@ -7,14 +7,11 @@ import (
 )
 
 type Session struct {
-	conn net.Conn
+	conn       net.Conn
+	dispatcher *Dispatcher
 }
 
 const inboundBufferSize = 64
-
-func NewSession(conn net.Conn) *Session {
-	return &Session{conn: conn}
-}
 
 func (s *Session) StartSessionListener() {
 	conn := s.conn
@@ -22,7 +19,7 @@ func (s *Session) StartSessionListener() {
 
 	for {
 		inboundBuffer := make([]byte, inboundBufferSize)
-		length, err := conn.Read(inboundBuffer)
+		_, err := conn.Read(inboundBuffer)
 
 		if err != nil {
 			break
@@ -30,14 +27,14 @@ func (s *Session) StartSessionListener() {
 
 		request, err := protocol.Decode[protocol.Request](inboundBuffer)
 
-		if err == nil {
-			fmt.Printf("<< 0x%x (%d bytes) {%s}\n", inboundBuffer, length, sender)
-			fmt.Printf("\t<< %s", request.String())
+		var response protocol.Response
+
+		if err != nil {
+			response = protocol.NewResponse("KIWI_DECODE_ERROR", true)
 		} else {
-			fmt.Printf("<< %s", err)
+			response = s.dispatcher.Dispatch(request)
 		}
 
-		response := s.executeCommand(&request)
 		responseBytes, err := protocol.Encode[protocol.Response](&response)
 
 		conn.Write(responseBytes)
@@ -45,16 +42,4 @@ func (s *Session) StartSessionListener() {
 
 	fmt.Println("=> " + sender)
 	conn.Close()
-}
-
-func (s *Session) executeCommand(request *protocol.Request) protocol.Response {
-	if request.Command == "PING" {
-		return protocol.Response{Err: false, Content: "PONG"}
-	}
-
-	if request.Command == "SET" {
-		fmt.Printf("\t%s %s %s\n", request.Command, request.Key, request.Value)
-	}
-
-	return protocol.Response{Err: true, Content: "KIWI_UNSUPPORTED_COMMAND"}
 }

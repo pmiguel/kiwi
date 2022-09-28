@@ -12,8 +12,8 @@ type Response struct {
 	Content string
 }
 
-func NewResponse(content string, error bool) *Response {
-	return &Response{Content: content, Err: error}
+func NewResponse(content string, error bool) Response {
+	return Response{Content: content, Err: error}
 }
 
 func (r Response) Bytes() []byte {

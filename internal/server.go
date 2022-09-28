@@ -12,19 +12,29 @@ type Server struct {
 	host           string
 	port           string
 	running        bool
-	sessionManager *SessionManager
+	SessionManager *SessionManager
+	StorageManager *StorageManager
+	Dispatcher     *Dispatcher
 }
 
 func NewServer(host string, port string) *Server {
 	return &Server{
-		host:           host,
-		port:           port,
-		running:        false,
-		sessionManager: NewSessionManager(true),
+		host:    host,
+		port:    port,
+		running: false,
 	}
 }
 
 func (s *Server) Start() {
+
+	if s.SessionManager == nil {
+		panic("Unable to initiate server. Session manager not defined.")
+	}
+
+	if s.StorageManager == nil {
+		panic("Unable to initiate server. Storage manager not defined.")
+	}
+
 	listener, err := net.Listen(proto, s.host+":"+s.port)
 	s.running = true
 
@@ -39,7 +49,7 @@ func (s *Server) Start() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		s.sessionManager.RegisterSession(conn)
+		s.SessionManager.RegisterSession(conn)
 	}
 	listener.Close()
 }

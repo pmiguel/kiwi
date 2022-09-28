@@ -8,23 +8,26 @@ import (
 type SessionManager struct {
 	sessions          map[net.Addr]*Session
 	autoStartSessions bool
+	server            *Server
 }
 
-func NewSessionManager(autoStartSession bool) *SessionManager {
-	return &SessionManager{
-		sessions:          make(map[net.Addr]*Session),
-		autoStartSessions: autoStartSession,
+func NewSessionManager(server *Server) *SessionManager {
+	sessionManager := &SessionManager{
+		sessions: make(map[net.Addr]*Session),
+		server:   server,
 	}
+
+	server.SessionManager = sessionManager
+	return sessionManager
 }
 
 func (sm *SessionManager) RegisterSession(conn net.Conn) {
-	session := NewSession(conn)
-	sm.sessions[conn.RemoteAddr()] = session
-	fmt.Println("<= " + conn.RemoteAddr().String())
+	session := Session{conn: conn, dispatcher: sm.server.Dispatcher}
 
-	if sm.autoStartSessions {
-		go session.StartSessionListener()
-	}
+	sm.sessions[conn.RemoteAddr()] = &session
+
+	fmt.Println("<= " + conn.RemoteAddr().String())
+	go session.StartSessionListener()
 }
 
 func (sm *SessionManager) GetSession(addr net.Addr) *Session {
