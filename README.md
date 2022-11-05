@@ -11,7 +11,7 @@ As added features, support for strong namespacing would be a nice to have additi
   - [x] GET
   - [x] SET
   - [x] DEL
-  - [ ] KEYS
+  - [X] KEYS
 - Features
   - [ ] Invalidation
     - [ ] TTL

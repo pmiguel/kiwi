@@ -1,25 +1,49 @@
 package internal
 
+import (
+	"fmt"
+	"strings"
+	"sync"
+)
+
 type StorageManager struct {
-	data   map[string]string
+	data   sync.Map
 	server *Server
 }
 
 func NewStorageManager(server *Server) *StorageManager {
-	storageManager := &StorageManager{data: make(map[string]string), server: server}
+	storageManager := &StorageManager{
+		server: server,
+	}
 
 	server.StorageManager = storageManager
 	return storageManager
 }
 
-func (s *StorageManager) Get(key string) string {
-	return s.data[key]
+func (sm *StorageManager) Get(key string) any {
+	value, ok := sm.data.Load(key)
+
+	if ok {
+		return value
+	}
+
+	return nil
 }
 
-func (s *StorageManager) Set(key string, value string) {
-	s.data[key] = value
+func (sm *StorageManager) Set(key string, value string) {
+	sm.data.Store(key, value)
 }
 
-func (s *StorageManager) Delete(key string) {
-	delete(s.data, key)
+func (sm *StorageManager) Delete(key string) {
+	sm.data.Delete(key)
+}
+
+func (sm *StorageManager) Keys() string {
+	var keys []string
+	sm.data.Range(func(key, value any) bool {
+		keys = append(keys, fmt.Sprintf("%v", key))
+		return true
+	})
+
+	return strings.Join(keys[:], ",")
 }

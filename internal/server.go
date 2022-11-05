@@ -17,14 +17,6 @@ type Server struct {
 	Dispatcher     *Dispatcher
 }
 
-func NewServer(host string, port string) *Server {
-	return &Server{
-		host:    host,
-		port:    port,
-		running: false,
-	}
-}
-
 func (s *Server) Start() {
 
 	if s.SessionManager == nil {
@@ -52,4 +44,12 @@ func (s *Server) Start() {
 		s.SessionManager.RegisterSession(conn)
 	}
 	listener.Close()
+}
+
+func NewServer(host string, port string) *Server {
+	return &Server{
+		host:    host,
+		port:    port,
+		running: false,
+	}
 }
