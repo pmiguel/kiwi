@@ -14,32 +14,42 @@ type Session struct {
 const inboundBufferSize = 64
 
 func (s *Session) StartSessionListener() {
-	conn := s.conn
-	sender := conn.RemoteAddr().String()
-
 	for {
 		inboundBuffer := make([]byte, inboundBufferSize)
-		_, err := conn.Read(inboundBuffer)
-
-		if err != nil {
-			break
-		}
-
-		request, err := protocol.Decode[protocol.Request](inboundBuffer)
+		_, readErr := s.conn.Read(inboundBuffer)
 
 		var response protocol.Response
 
-		if err != nil {
+		if readErr != nil {
+			fmt.Printf("Error reading socket: %s", readErr)
+			break
+		}
+
+		request, decodeErr := protocol.Decode[protocol.Request](inboundBuffer)
+
+		if decodeErr != nil {
 			response = protocol.NewResponse("KIWI_DECODE_ERROR", true)
 		} else {
 			response = s.dispatcher.Dispatch(request)
 		}
 
-		responseBytes, err := protocol.Encode[protocol.Response](&response)
+		responseBytes, encodeErr := protocol.Encode[protocol.Response](&response)
 
-		conn.Write(responseBytes)
+		if encodeErr != nil {
+			fmt.Printf("Error encoding response: %s", encodeErr)
+			break
+		}
+
+		_, writeErr := s.conn.Write(responseBytes)
+
+		if writeErr != nil {
+			fmt.Printf("Error writing to socket: %s", writeErr)
+			break
+		}
 	}
 
-	fmt.Println("=> " + sender)
-	conn.Close()
+	err := s.conn.Close()
+	if err != nil {
+		fmt.Printf("Error closing socket: %s", err)
+	}
 }
