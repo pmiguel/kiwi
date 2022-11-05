@@ -1,6 +1,6 @@
 # 🥝 Kiwi
 
-Kiwi is a Key-Value storage server, completely written from scratch in Go as a personal pet project ands exercise to learn the Go programming language. 
+Kiwi is a Key-Value storage server, written from scratch in Go as a personal pet project ands exercise to learn the Go programming language. 
 
 It aims to be as an alternative for Redis, and to support at least a subset of the commands provided by Redis, for familarity reasons. 
 As added features, support for strong namespacing would be a nice to have addition.
@@ -10,22 +10,23 @@ As added features, support for strong namespacing would be a nice to have additi
   - [x] PING
   - [x] GET
   - [x] SET
-  - [ ] DEL
+  - [x] DEL
   - [ ] KEYS
-- [ ] Namespacing
-- [ ] Distributed Locks
-- [ ] TTL
-  - [ ] Simple time based
-  - [ ] Counter based
-  - [ ] Duration based, with refresh on hit
-- [ ] Simple Auth
-- Protocols:
-  - [ ] Connection Handshake and protocol negociation
-  - Kiwi Communication Protocol (KCP)
-    - [x] V0: durimentary string marshalling to bytes for testing purposes
-    - [ ] V1: Protobuf-based
-  - [ ] Redis RESP-compatible protocol
+- Features
+  - [ ] Invalidation
+    - [ ] TTL
+  - [ ] Namespacing 
+  - [ ] Distributed Locks
+  - [ ] Simple Auth
+    - [ ] Namespacing ACL
+- Networking:
+  - Multi-protocol support
+    - [ ] Connection Handshake and protocol negotiation
+    - Supported Protocols
+        - [x] KiwiV0: rudimentary string marshalling for testing purposes
+        - [ ] KiwiV1: Custom binary serialization or Protobuf
+        - [ ] Redis RESPv3-compatible protocol
 
 ## Name Origin
 
-🥝 Kiwi in Portuguese reads as "Kivi", fonetically similar to Key-V. V in this case would stand for Value.
+🥝 Kiwi in Portuguese reads as "Kivi", phonetically similar to Key-V. V in this case would stand for Value.
