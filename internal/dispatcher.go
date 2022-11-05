@@ -36,5 +36,11 @@ func (d *Dispatcher) Dispatch(request protocol.Request) protocol.Response {
 		return protocol.Response{Err: false, Content: value}
 	}
 
+	if request.Command == "DEL" {
+		d.storageManager.Delete(request.Key)
+
+		return protocol.Response{Err: false, Content: "OK"}
+	}
+
 	return protocol.Response{Err: true, Content: "KIWI_UNKNOWN_COMMAND"}
 }
