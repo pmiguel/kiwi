@@ -22,7 +22,7 @@ func NewSessionManager(server *Server) *SessionManager {
 }
 
 func (sm *SessionManager) RegisterSession(conn net.Conn) {
-	session := Session{conn: conn, dispatcher: sm.server.Dispatcher}
+	session := NewSession(conn, sm.server.Dispatcher)
 
 	sm.sessions[conn.RemoteAddr()] = &session
 
