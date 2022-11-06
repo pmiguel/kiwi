@@ -1,6 +1,6 @@
 module github.com/pmiguel/kiwi
 
-go 1.18
+go 1.19
 
 require github.com/pmiguel/kiwi/pkg/protocol v0.0.0
 

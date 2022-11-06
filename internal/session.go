@@ -7,12 +7,18 @@ import (
 	"net"
 )
 
+const inboundBufferSize uint8 = 64
+
+// Session represents an active connection to a connected client.
 type Session struct {
 	id         uuid.UUID
 	conn       net.Conn
 	dispatcher *Dispatcher
 }
 
+// NewSession creates a new Session struct containing the connection information,
+// a reference to the internal.Dispatcher, along with a unique identifier for the connected
+// client connection.
 func NewSession(conn net.Conn, dispatcher *Dispatcher) Session {
 	return Session{
 		id:         uuid.New(),
@@ -21,8 +27,10 @@ func NewSession(conn net.Conn, dispatcher *Dispatcher) Session {
 	}
 }
 
-const inboundBufferSize = 64
-
+// The read function reads inboundBufferSize bytes from the connected socket
+// and returns a protocol.Request object representing the request being made to the server
+// It returns either the protocol.Request in the expected format, or an error representing either a read error
+// or a serialization error
 func (s *Session) read() (*protocol.Request, error) {
 	var err error = nil
 	var request protocol.Request
@@ -37,6 +45,8 @@ func (s *Session) read() (*protocol.Request, error) {
 	return &request, err
 }
 
+// The write function receives a protocol.Response object containing the result to a given command
+// and writes it into the connected buffer, as a byte array
 func (s *Session) write(response *protocol.Response) error {
 	responseBytes, err := protocol.Encode[protocol.Response](response)
 
@@ -46,6 +56,9 @@ func (s *Session) write(response *protocol.Response) error {
 	return err
 }
 
+// StartSessionListener starts a new handler for the connected client that will receive protocol.Request and
+// respond with protocol.Response containing the result of the operation.
+// This operation happens continuously until the server or the client disconnects.
 func (s *Session) StartSessionListener() {
 	sessionId := s.id.String()
 	log.Printf("%s Started session listener for client: %s", sessionId, s.conn.RemoteAddr().String())

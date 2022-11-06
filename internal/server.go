@@ -5,13 +5,17 @@ import (
 	"net"
 )
 
-const proto = "tcp"
+const (
+	Host     = "0.0.0.0"
+	Port     = "7170"
+	Protocol = "tcp"
+)
 
 type Server struct {
 	host           string
 	port           string
 	running        bool
-	SessionManager *SessionManager
+	SessionManager *Manager
 	StorageManager *StorageManager
 	Dispatcher     *Dispatcher
 }
@@ -26,7 +30,7 @@ func (s *Server) Start() {
 		log.Fatal("Unable to initiate server. Storage manager not defined.")
 	}
 
-	listener, err := net.Listen(proto, s.host+":"+s.port)
+	listener, err := net.Listen(Protocol, s.host+":"+s.port)
 	s.running = true
 
 	if err != nil {
