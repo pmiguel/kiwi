@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"net"
 )
@@ -20,11 +19,11 @@ type Server struct {
 func (s *Server) Start() {
 
 	if s.SessionManager == nil {
-		panic("Unable to initiate server. Session manager not defined.")
+		log.Fatal("Unable to initiate server. Session manager not defined.")
 	}
 
 	if s.StorageManager == nil {
-		panic("Unable to initiate server. Storage manager not defined.")
+		log.Fatal("Unable to initiate server. Storage manager not defined.")
 	}
 
 	listener, err := net.Listen(proto, s.host+":"+s.port)
@@ -34,13 +33,15 @@ func (s *Server) Start() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Kiwi listening on port " + s.port)
+	log.Print("Listening on port " + s.port)
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Printf("Client connected: %s", conn.RemoteAddr().String())
+
 		s.SessionManager.RegisterSession(conn)
 	}
 	listener.Close()

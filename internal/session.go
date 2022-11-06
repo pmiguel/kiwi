@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"fmt"
 	"github.com/pmiguel/kiwi/pkg/protocol"
+	"log"
 	"net"
 )
 
@@ -14,42 +14,48 @@ type Session struct {
 const inboundBufferSize = 64
 
 func (s *Session) StartSessionListener() {
+	log.Printf("Started session listener for client: %s", s.conn.RemoteAddr().String())
+
 	for {
 		inboundBuffer := make([]byte, inboundBufferSize)
-		_, readErr := s.conn.Read(inboundBuffer)
+		length, readErr := s.conn.Read(inboundBuffer)
+
+		log.Printf("Read %d bytes", length)
 
 		var response protocol.Response
 
 		if readErr != nil {
-			fmt.Printf("Error reading socket: %s", readErr)
+			log.Printf("Error reading socket: %s. Closing session...", readErr)
 			break
 		}
 
 		request, decodeErr := protocol.Decode[protocol.Request](inboundBuffer)
 
 		if decodeErr != nil {
+			log.Printf("Error decoding request %s", decodeErr)
+
 			response = protocol.NewResponse("KIWI_DECODE_ERROR", true)
 		} else {
+			log.Printf("Processing %s %s %s", request.Command, request.Key, request.Value)
 			response = s.dispatcher.Dispatch(request)
 		}
 
 		responseBytes, encodeErr := protocol.Encode[protocol.Response](&response)
 
 		if encodeErr != nil {
-			fmt.Printf("Error encoding response: %s", encodeErr)
+			log.Printf("Error encoding response: %s", encodeErr)
 			break
 		}
 
 		_, writeErr := s.conn.Write(responseBytes)
 
 		if writeErr != nil {
-			fmt.Printf("Error writing to socket: %s", writeErr)
+			log.Printf("Error writing to socket: %s", writeErr)
 			break
 		}
 	}
 
-	err := s.conn.Close()
-	if err != nil {
-		fmt.Printf("Error closing socket: %s", err)
+	if closeErr := s.conn.Close(); closeErr != nil {
+		log.Printf("Error closing socket: %s", closeErr)
 	}
 }

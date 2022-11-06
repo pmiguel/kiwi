@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"fmt"
+	"log"
 	"net"
 )
 
@@ -26,7 +26,8 @@ func (sm *SessionManager) RegisterSession(conn net.Conn) {
 
 	sm.sessions[conn.RemoteAddr()] = &session
 
-	fmt.Println("<= " + conn.RemoteAddr().String())
+	log.Printf("Registered session for client: %s", conn.RemoteAddr().String())
+
 	go session.StartSessionListener()
 }
 
