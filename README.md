@@ -7,11 +7,11 @@ As added features, support for strong namespacing would be a nice to have additi
 
 ## Planned work for first demo:
 - Supported Commands:
-  - [x] PING
-  - [x] GET
-  - [x] SET
-  - [x] DEL
-  - [X] KEYS
+  - [x] `PING`: returns `PONG`
+  - [x] `GET <key>`: retrieves the string value of a key
+  - [x] `SET <key> <value>`: sets the string value of a key
+  - [x] `DEL <key>`: deletes a key
+  - [X] `KEYS`: returns list of all available keys
 - Features
   - [ ] Invalidation
     - [ ] TTL
