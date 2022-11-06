@@ -17,7 +17,7 @@ func NewDispatcher(server *Server, storageManager *StorageManager) *Dispatcher {
 	return dispatcher
 }
 
-func (d *Dispatcher) Dispatch(request protocol.Request) protocol.Response {
+func (d *Dispatcher) Dispatch(request *protocol.Request) protocol.Response {
 	if request.Command == "PING" {
 		return protocol.Response{Err: false, Content: "PONG"}
 	}
