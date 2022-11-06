@@ -5,7 +5,7 @@ Kiwi is a Key-Value storage server, written from scratch in Go as a personal pet
 It aims to be as an alternative for Redis, and to support at least a subset of the commands provided by Redis, for familarity reasons. 
 As added features, support for strong namespacing would be a nice to have addition.
 
-## Planned work for first demo:
+## PoC milestones
 - Supported Commands:
   - [x] `PING`: returns `PONG`
   - [x] `GET <key>`: retrieves the string value of a key
@@ -29,4 +29,4 @@ As added features, support for strong namespacing would be a nice to have additi
 
 ## Name Origin
 
-🥝 Kiwi in Portuguese reads as "Kivi", phonetically similar to Key-V. V in this case would stand for Value.
+🥝 In Portuguese, Kiwi reads as "Quivi". Phonetically, it is pronounced as "Key-V", which is a play-on-words as short for Key-Value.
