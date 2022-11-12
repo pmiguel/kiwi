@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/google/uuid"
 	"github.com/pmiguel/kiwi/pkg/protocol"
+	"github.com/pmiguel/kiwi/pkg/protocol/encoding"
 	"log"
 	"net"
 )
@@ -39,7 +40,7 @@ func (s *Session) read() (*protocol.Request, error) {
 	_, err = s.conn.Read(inboundBuffer)
 
 	if err == nil {
-		request, err = protocol.Decode[protocol.Request](inboundBuffer)
+		request, err = encoding.Decode[protocol.Request](inboundBuffer)
 	}
 
 	return &request, err
@@ -48,7 +49,7 @@ func (s *Session) read() (*protocol.Request, error) {
 // The write function receives a protocol.Response object containing the result to a given command
 // and writes it into the connected buffer, as a byte array
 func (s *Session) write(response *protocol.Response) error {
-	responseBytes, err := protocol.Encode[protocol.Response](response)
+	responseBytes, err := encoding.Encode[protocol.Response](response)
 
 	if err == nil {
 		_, err = s.conn.Write(responseBytes)

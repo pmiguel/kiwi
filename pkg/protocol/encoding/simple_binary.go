@@ -1,11 +1,12 @@
-package protocol
+package encoding
 
 import (
 	"bytes"
 	"encoding/gob"
+	"github.com/pmiguel/kiwi/pkg/protocol"
 )
 
-func Decode[T Request | Response](packet []byte) (T, error) {
+func Decode[T protocol.Request | protocol.Response](packet []byte) (T, error) {
 	buffer := bytes.NewBuffer(packet)
 	dec := gob.NewDecoder(buffer)
 
@@ -15,7 +16,7 @@ func Decode[T Request | Response](packet []byte) (T, error) {
 	return req, err
 }
 
-func Encode[T Request | Response](response *T) ([]byte, error) {
+func Encode[T protocol.Request | protocol.Response](response *T) ([]byte, error) {
 	buffer := bytes.Buffer{}
 	dec := gob.NewEncoder(&buffer)
 

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/pmiguel/kiwi/pkg/protocol"
+	"github.com/pmiguel/kiwi/pkg/protocol/encoding"
 	"log"
 	"net"
 	"os"
@@ -49,11 +50,11 @@ func main() {
 			request = protocol.NewRequest(tokens[0], tokens[1], tokens[2])
 		}
 
-		requestBytes, _ := protocol.Encode[protocol.Request](request)
+		requestBytes, _ := encoding.Encode[protocol.Request](request)
 
 		conn.Write(requestBytes)
 		conn.Read(readBuffer)
-		dec, _ := protocol.Decode[protocol.Response](readBuffer)
+		dec, _ := encoding.Decode[protocol.Response](readBuffer)
 
 		fmt.Printf("%s (Err: %t)\n", dec.Content, dec.Err)
 	}
