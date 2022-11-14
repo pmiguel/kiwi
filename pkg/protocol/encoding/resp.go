@@ -4,14 +4,15 @@ import (
 	"fmt"
 )
 
-type ContentType uint8
+type Int int64
+type SimpleString string
+type BulkString string
+type Error string
+type Array []RestType
 
-const (
-	SimpleString ContentType = iota
-	Error
-	Integer
-	BulkString
-)
+type RestType interface {
+	Encode() string
+}
 
 const (
 	prefixSimpleString = '+'
@@ -22,50 +23,67 @@ const (
 	separator          = "\r\n"
 )
 
-type Primitive struct {
-	PrimitiveType ContentType
-	Content       *string
+func (i *Int) Encode() string {
+	return fmt.Sprintf("%c%d%s", prefixInteger, i, separator)
 }
 
-func Int64ToPrimitive(input int64) Primitive {
-	str := fmt.Sprint(input)
-	return Primitive{PrimitiveType: Integer, Content: &str}
-}
-
-func StringToPrimitive(input string) Primitive {
-	str := fmt.Sprint(input)
-	return Primitive{PrimitiveType: SimpleString, Content: &str}
-}
-
-func (p *Primitive) Encode() string {
-	if p.Content != nil {
-		switch p.PrimitiveType {
-		case SimpleString:
-			return fmt.Sprintf("%c%s%s", prefixSimpleString, *p.Content, separator)
-		case Error:
-			return fmt.Sprintf("%c%s%s", prefixError, *p.Content, separator)
-		case Integer:
-			return fmt.Sprintf("%c%s%s", prefixInteger, *p.Content, separator)
-		case BulkString:
-			return fmt.Sprintf("%c%d%s%s%s", prefixBulkString, len(*p.Content), separator, *p.Content, separator)
-		}
+func DecodeInt(input string) Int {
+	var out Int
+	_, err := fmt.Sscanf(input, ":%d\r\n", &out)
+	if err != nil {
+		return 0
 	}
-
-	return fmt.Sprintf("%c%d%s", prefixBulkString, -1, separator)
+	return out
 }
 
-type ContentArray struct {
-	Content []Primitive
+func (str *SimpleString) Encode() string {
+	return fmt.Sprintf("%c%s%s", prefixSimpleString, *str, separator)
 }
 
-func (c *ContentArray) Encode() string {
-	if c.Content == nil {
+func DecodeSimpleString(input string) SimpleString {
+	var out SimpleString
+	_, err := fmt.Sscanf(input, "+%s\r\n", &out)
+	if err != nil {
+		return ""
+	}
+	return out
+}
+
+func (str *BulkString) Encode() string {
+	return fmt.Sprintf("%c%d%s%s%s", prefixBulkString, len(*str), separator, *str, separator)
+}
+
+func DecodeBulkString(input string) BulkString {
+	var out BulkString
+	var length int
+	_, err := fmt.Sscanf(input, "$%d\r\n%s\r\n", &length, &out)
+	if err != nil {
+		return ""
+	}
+	return out
+}
+
+func (str *Error) Encode() string {
+	return fmt.Sprintf("%c%s%s", prefixError, *str, separator)
+}
+
+func DecodeError(input string) Error {
+	var out Error
+	_, err := fmt.Sscanf(input, "+%s\r\n", &out)
+	if err != nil {
+		return ""
+	}
+	return out
+}
+
+func (arr Array) Encode() string {
+	if arr == nil {
 		return fmt.Sprintf("%c%d%s", prefixArray, -1, separator)
 	}
-	itemCount := len(c.Content)
+	itemCount := len(arr)
 	buff := fmt.Sprintf("%c%d%s", prefixArray, itemCount, separator)
 	for i := 0; i < itemCount; i++ {
-		value := c.Content[i].Encode()
+		value := arr[i].Encode()
 		buff += fmt.Sprintf("%s", value)
 	}
 	return buff
