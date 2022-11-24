@@ -5,16 +5,28 @@ import (
 	"testing"
 )
 
-func TestInt_Encode(t *testing.T) {
+func TestInt_Encode_PositiveNumber(t *testing.T) {
 	input := Int(123)
 	output := input.Encode()
 	assert.Equal(t, ":123\r\n", output, "should be equal")
 }
 
-func TestInt_Decode(t *testing.T) {
+func TestInt_Encode_NegativeNumber(t *testing.T) {
+	input := Int(-123)
+	output := input.Encode()
+	assert.Equal(t, ":-123\r\n", output, "should be equal")
+}
+
+func TestInt_Decode_PositiveNumber(t *testing.T) {
 	input := ":123\r\n"
 	output := DecodeInt(input)
 	assert.Equal(t, Int(123), output, "should be equal")
+}
+
+func TestInt_Decode_NegativeNumber(t *testing.T) {
+	input := ":-123\r\n"
+	output := DecodeInt(input)
+	assert.Equal(t, Int(-123), output, "should be equal")
 }
 
 func TestSimpleString_Encode_NoSpaces(t *testing.T) {
@@ -94,4 +106,27 @@ func TestArray_Encode_Strings(t *testing.T) {
 	output := input.Encode()
 
 	assert.Equal(t, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n", output, "should be equal")
+}
+
+func TestDecodeLength_PositiveNumber(t *testing.T) {
+	input := "12\r\n"
+	output, index := DecodeLength([]rune(input), 0)
+
+	assert.Equal(t, 12, output)
+	assert.Equal(t, 4, index)
+}
+
+func TestDecodeLength_NegativeNumber(t *testing.T) {
+	input := "-12\r\n"
+	output, index := DecodeLength([]rune(input), 0)
+
+	assert.Equal(t, -12, output)
+	assert.Equal(t, 5, index)
+}
+
+func TestDecodeArray(t *testing.T) {
+	input := "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n"
+	output := DecodeArray(input)
+	expected := []string{"hello", "world"}
+	assert.Equal(t, expected, output)
 }
