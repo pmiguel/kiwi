@@ -5,14 +5,13 @@ import (
 	"net"
 )
 
-type Manager struct {
-	sessions          map[net.Addr]*Session
-	autoStartSessions bool
-	server            *Server
+type SessionManager struct {
+	sessions map[net.Addr]*Session
+	server   *Server
 }
 
-func NewSessionManager(server *Server) *Manager {
-	sessionManager := &Manager{
+func NewSessionManager(server *Server) *SessionManager {
+	sessionManager := &SessionManager{
 		sessions: make(map[net.Addr]*Session),
 		server:   server,
 	}
@@ -21,7 +20,7 @@ func NewSessionManager(server *Server) *Manager {
 	return sessionManager
 }
 
-func (sm *Manager) RegisterSession(conn net.Conn) {
+func (sm *SessionManager) RegisterSession(conn net.Conn) {
 	session := NewSession(conn, sm.server.Dispatcher)
 
 	sm.sessions[conn.RemoteAddr()] = &session
@@ -31,6 +30,6 @@ func (sm *Manager) RegisterSession(conn net.Conn) {
 	go session.StartSessionListener()
 }
 
-func (sm *Manager) GetSession(addr net.Addr) *Session {
+func (sm *SessionManager) GetSession(addr net.Addr) *Session {
 	return sm.sessions[addr]
 }

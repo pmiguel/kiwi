@@ -40,7 +40,7 @@ func (s *Session) read() (*protocol.Request, error) {
 	_, err = s.conn.Read(inboundBuffer)
 
 	if err == nil {
-		request, err = kcp.Decode[protocol.Request](inboundBuffer)
+		request = ParseRawRequest(inboundBuffer)
 	}
 
 	return &request, err

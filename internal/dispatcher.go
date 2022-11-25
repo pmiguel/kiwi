@@ -23,12 +23,12 @@ func (d *Dispatcher) Dispatch(request *protocol.Request) protocol.Response {
 	}
 
 	if request.Command == "SET" {
-		d.storageManager.Set(request.Key, request.Value)
+		d.storageManager.Set(request.Arguments[0], request.Arguments[1])
 		return protocol.Response{Err: false, Content: "OK"}
 	}
 
 	if request.Command == "GET" {
-		value := d.storageManager.Get(request.Key)
+		value := d.storageManager.Get(request.Arguments[0])
 
 		if value == nil {
 			return protocol.Response{Err: true, Content: "KIWI_KEY_NOT_FOUND"}
@@ -38,7 +38,7 @@ func (d *Dispatcher) Dispatch(request *protocol.Request) protocol.Response {
 	}
 
 	if request.Command == "DEL" {
-		d.storageManager.Delete(request.Key)
+		d.storageManager.Delete(request.Arguments[0])
 
 		return protocol.Response{Err: false, Content: "OK"}
 	}

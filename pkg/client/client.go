@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pmiguel/kiwi/pkg/protocol"
 	"github.com/pmiguel/kiwi/pkg/protocol/kcp"
+	"github.com/pmiguel/kiwi/pkg/protocol/resp"
 	"log"
 	"net"
 	"os"
@@ -26,34 +27,37 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for {
-		var readBuffer = make([]byte, 1024)
+	prompt := conn.RemoteAddr().String() + " >> "
 
-		fmt.Print(conn.RemoteAddr().String() + " >> ")
+	for {
+
+		fmt.Print(prompt)
 		text, _ := reader.ReadString('\n')
 
-		target := strings.TrimSpace(text)
+		rawInputString := strings.TrimSpace(text)
 
-		tokens := strings.Split(target, " ")
+		tokens := strings.Split(rawInputString, " ")
 
-		var request *protocol.Request
+		var respArray = resp.Array{}
 
-		if len(tokens) == 1 {
-			request = protocol.NewRequest(tokens[0], "#", "#")
+		for i := 0; i < len(tokens); i++ {
+			respArray = append(respArray, resp.BulkString(tokens[i]))
 		}
 
-		if len(tokens) == 2 {
-			request = protocol.NewRequest(tokens[0], tokens[1], "#")
+		// writeBytes, _ := kcp.Encode[protocol.Request](protocol.NewRequest(, "#", "#"))
+
+		_, writeErr := conn.Write([]byte(respArray.Encode()))
+
+		if writeErr != nil {
+			log.Fatal(writeErr)
 		}
 
-		if len(tokens) == 3 {
-			request = protocol.NewRequest(tokens[0], tokens[1], tokens[2])
+		readBuffer := make([]byte, 1024)
+		_, readErr := conn.Read(readBuffer)
+		if readErr != nil {
+			log.Fatal(readErr)
 		}
 
-		requestBytes, _ := kcp.Encode[protocol.Request](request)
-
-		conn.Write(requestBytes)
-		conn.Read(readBuffer)
 		dec, _ := kcp.Decode[protocol.Response](readBuffer)
 
 		fmt.Printf("%s (Err: %t)\n", dec.Content, dec.Err)

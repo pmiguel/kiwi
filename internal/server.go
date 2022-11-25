@@ -15,7 +15,7 @@ type Server struct {
 	host           string
 	port           string
 	running        bool
-	SessionManager *Manager
+	SessionManager *SessionManager
 	StorageManager *StorageManager
 	Dispatcher     *Dispatcher
 }
