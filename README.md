@@ -12,20 +12,9 @@ As added features, support for strong namespacing would be a nice to have additi
   - [x] `SET <key> <value>`: sets the string value of a key
   - [x] `DEL <key>`: deletes a key
   - [X] `KEYS`: returns list of all available keys
-- Features
-  - [ ] Invalidation
-    - [ ] TTL
-  - [ ] Namespacing 
-  - [ ] Distributed Locks
-  - [ ] Simple Auth
-    - [ ] Namespacing ACL
-- Networking:
-  - Multi-protocol support
-    - [ ] Connection Handshake and protocol negotiation
-    - Supported Protocols
-        - [x] KiwiV0: rudimentary string marshalling for testing purposes
-        - [ ] KiwiV1: Custom binary serialization or Protobuf
-        - [ ] Redis RESPv3-compatible protocol
+ 
+- Supported encodings:
+   - [x] Redis RESP Protocol
 
 ## Name Origin
 
